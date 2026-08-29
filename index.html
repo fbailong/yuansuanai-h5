@@ -378,6 +378,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
         <button class="btn btn-ghost" style="margin-top:6px" onclick="goEdit()">✏️ 改一下资料重新匹配</button>
       </div>
 
+      <!-- ========== 真实匹配：交给 AI 智能体（bot） ========== -->
+      <div id="botHandoff" class="hide" style="margin-top:18px;background:linear-gradient(135deg,#fff7fb,#fff0f6);border:1px solid #ffd6e7;border-radius:18px;padding:18px;text-align:center">
+        <div style="font-size:1.25rem;font-weight:700;color:#e0457b">🤖 以上为演示匹配（示例数据）</div>
+        <div style="color:#7a5a66;font-size:1.05rem;margin:8px 0 14px">想算你与 <b>真实会员</b> 的缘分？用 AI 智能体，由真实引擎为你匹配：</div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+          <button class="btn btn-pri" onclick="openBot('coze')">💬 打开缘算AI智能体（扣子）</button>
+          <button class="btn btn-gold" onclick="openBot('yuanqi')">💬 打开元器智能体（后期）</button>
+        </div>
+        <div style="color:#b06;font-size:.85rem;margin-top:10px">智能体已在扣子上线，元器版后续发布</div>
+      </div>
+
     <div id="adviceBox" style="margin-top:16px"></div>
   </div>
 
@@ -817,7 +828,7 @@ function renderFate(){
 
 function renderRecs(){
   const box=document.getElementById('recList');
-  if(!top3.length){box.innerHTML='<div class="empty">没有符合要求的异性对象，试试放宽要求或点「改一下资料重新匹配」</div>';return}
+  if(!top3.length){box.innerHTML='<div class="empty">没有符合要求的异性对象，试试放宽要求或点「改一下资料重新匹配」</div>';document.getElementById('botHandoff').classList.remove('hide');return}
   let html='';
   top3.forEach((r,i)=>{
     const ph=r.photo?'<img class="av" src="'+r.photo+'">':'<div class="av">'+(r.gender==='男'?'👨':'👩')+'</div>';
@@ -850,6 +861,7 @@ function renderRecs(){
     '</div>';
   });
   box.innerHTML=html;
+  document.getElementById('botHandoff').classList.remove('hide');
   const r=child.req||{};
   let parts=[];
   if(r.ageMin!=null||r.ageMax!=null)parts.push('年龄'+(r.ageMin!=null?r.ageMin:'')+'~'+(r.ageMax!=null?r.ageMax:'')+'岁');
@@ -1049,6 +1061,29 @@ function loadSamplePool(){
     mk('p15','徐墨','男',33,'1992-08-15','INTJ','医生','北京','xumo33','137-9900-1122','博士',180,['沉稳','有房']),
     mk('p16','顾晚晴','女',28,'1997-03-20','ISFJ','财务','深圳','guwanqing28','135-5566-7788','本科',167,['温柔','稳定','有房'])
   ];
+}
+
+/* ============ 真实匹配：AI智能体（bot）链接配置 ============ */
+/* 从扣子/元器「发布→网页/分享」复制链接，粘贴到对应 url 即可；留空则按钮提示「请在配置区填入bot链接」，不会出错。
+   如需内嵌对话（而非新窗口打开），把对应平台提供的 iframe 嵌入地址填到 EMBED 即可，留空则用按钮跳转。 */
+const BOT_LINKS = {
+  coze:   '',   // ← 粘贴你的扣子 bot 网页链接
+  yuanqi: ''    // ← 元器发布后粘贴
+};
+const BOT_EMBED = {
+  coze:   '',   // 可选：扣子 iframe 嵌入地址（留空则按钮跳转）
+  yuanqi: ''    // 可选：元器 iframe 嵌入地址
+};
+function openBot(p){
+  const u = BOT_LINKS[p];
+  const e = BOT_EMBED[p];
+  if(e && /^https?:\/\//.test(e)){
+    const w=window.open('','_blank'); w.document.write('<iframe src="'+e+'" style="width:100%;height:100vh;border:0"></iframe>');
+  } else if(u && /^https?:\/\//.test(u)){
+    window.open(u,'_blank');
+  } else {
+    toast('请在配置区填入'+(p==='coze'?'扣子':'元器')+'智能体链接');
+  }
 }
 
 /* ============ 启动 ============ */
